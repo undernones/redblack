@@ -3,6 +3,6 @@
 
 int main(int argc, char* argv[])
 {
-    Tree t;
+    Tree<int> t;
     return 0;
 }

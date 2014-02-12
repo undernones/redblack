@@ -2,11 +2,9 @@
 #define TREE_H
 
 // TODO:
-// * templatize
 // * iterators
 
-typedef int T;
-
+template <class T>
 class Tree
 {
 public:
@@ -25,6 +23,26 @@ public:
 private:
     Tree(const Tree& t) = default;
     Tree& operator=(const Tree& t) = default;
+
+    class Node
+    {
+    public:
+        Node* parent;
+        Node* left;
+        Node* right;
+        T value;
+    };
 };
+
+
+template <class T>
+Tree<T>::Tree()
+{
+}
+
+template <class T>
+Tree<T>::~Tree()
+{
+}
 
 #endif // TREE_H

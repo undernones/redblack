@@ -26,7 +26,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
     add_definitions(-DNDEBUG)
 endif()
 
-set(SRC Tree.cpp)
+set(SRC )
 add_executable(headless main.cpp ${SRC})
 
 message(STATUS)
