@@ -10,17 +10,12 @@ int main(int argc, char* argv[])
 
     Tree<int> t;
 
-    std::vector<int> randomData = { 1, 28, 81, /*51, 53, 6, 51, 42, 87, 34,*/ };
-    for (int x : randomData) {
-        t.add(x);
+    for (int i = 0; i < 50; ++i) {
+        int value = std::rand() % 100;
+        std::cout << value << " ";
+        t.add(value);
     }
-
-    //for (int i = 0; i < 10; ++i) {
-    //    int value = std::rand() % 100;
-    //    std::cout << value << std::endl;
-    //    t.add(value);
-    //}
-    //std::cout << std::endl;
+    std::cout << std::endl;
     t.print();
     std::cout << "size: " << t.size() << std::endl;
 
