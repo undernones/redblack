@@ -36,5 +36,11 @@ int main(int argc, char* argv[])
     u.print();
     std::cout << "size: " << u.size() << std::endl;
 
+    Tree<std::string>::iterator it;
+    std::cout << "ingrementing" << std::endl;
+    it++;
+    std::cout << "ingremented" << std::endl;
+    std::cout << *it << std::endl;
+
     return 0;
 }

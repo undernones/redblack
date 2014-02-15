@@ -1,9 +1,26 @@
 #ifndef TREE_H
 #define TREE_H
 
+#include <boost/iterator/iterator_facade.hpp>
+
 template <class T>
 class Tree
 {
+private:
+    struct Node
+    {
+        Node(const T& v) : value(v)
+        { }
+
+        ~Node()
+        { }
+
+        Node* parent;
+        std::unique_ptr<Node> left;
+        std::unique_ptr<Node> right;
+        T value;
+    };
+
 public:
     Tree();
     ~Tree();
@@ -23,28 +40,28 @@ public:
         if (mRoot) print(mRoot.get());
     }
 
-    class iterator
+    // Iterator
+    class iterator : public boost::iterator_facade<
+         iterator, T, boost::forward_traversal_tag>
     {
-        // TODO: ???
+    public:
+        iterator() : iterator(NULL) {}
+        iterator(Node* n) : mNode(n) {}
+
+    private:
+        friend class boost::iterator_core_access;
+
+        void increment();
+        bool equal(iterator const& other) const;
+        T& dereference() const;
+
+        Node* mNode;
     };
 
 private:
     Tree(const Tree& t) = default;
     Tree& operator=(const Tree& t) = default;
 
-    struct Node
-    {
-        Node(const T& v) : value(v)
-        { }
-
-        ~Node()
-        { }
-
-        Node* parent;
-        std::unique_ptr<Node> left;
-        std::unique_ptr<Node> right;
-        T value;
-    };
     std::unique_ptr<Node> mRoot;
     size_t mSize;
 
@@ -62,6 +79,9 @@ private:
 };
 
 
+// --------------------------------------------------------------------------
+// Tree implementation
+// --------------------------------------------------------------------------
 template <class T>
 Tree<T>::Tree()
     : mRoot(nullptr)
@@ -110,6 +130,40 @@ Tree<T>::add(const T& value)
         }
     }
     return false;
+}
+
+
+// --------------------------------------------------------------------------
+// Iterator implementation
+// --------------------------------------------------------------------------
+template <class T>
+void
+Tree<T>::iterator::increment()
+{
+    if (!mNode) {
+        // TODO: throw an exception
+    }
+
+    if (mNode->right) {
+        mNode = mNode->right.get();
+    }
+}
+
+template <class T>
+bool
+Tree<T>::iterator::equal(iterator const& other) const
+{
+    if (!mNode || !other.mNode) {
+        return false;
+    }
+    return mNode->value == other.mNode->value;
+}
+
+template <class T>
+T&
+Tree<T>::iterator::dereference() const
+{
+    return mNode->value;
 }
 
 #endif // TREE_H
