@@ -20,7 +20,7 @@ public:
     // TODO: remove
     void print() const
     {
-        if (mRoot) print(mRoot);
+        if (mRoot) print(mRoot.get());
     }
 
     class iterator
@@ -38,28 +38,25 @@ private:
         { }
 
         ~Node()
-        {
-            delete left;
-            delete right;
-        }
+        { }
 
         Node* parent;
-        Node* left;
-        Node* right;
+        std::unique_ptr<Node> left;
+        std::unique_ptr<Node> right;
         T value;
     };
-    Node* mRoot;
+    std::unique_ptr<Node> mRoot;
     size_t mSize;
 
     // TODO: remove
     void print(const Node* node) const
     {
         if (node->left) {
-            print(node->left);
+            print(node->left.get());
         }
         std::cout << node->value << std::endl;
         if (node->right) {
-            print(node->right);
+            print(node->right.get());
         }
     }
 };
@@ -67,7 +64,7 @@ private:
 
 template <class T>
 Tree<T>::Tree()
-    : mRoot(NULL)
+    : mRoot(nullptr)
     , mSize(0)
 {
 }
@@ -75,7 +72,6 @@ Tree<T>::Tree()
 template <class T>
 Tree<T>::~Tree()
 {
-    delete mRoot;
 }
 
 template <class T>
@@ -83,12 +79,12 @@ bool
 Tree<T>::add(const T& value)
 {
     if (!mRoot) {
-        mRoot = new Node(value);
+        mRoot.reset(new Node(value));
         mSize++;
         return true;
     }
 
-    Node* current = mRoot;
+    Node* current = mRoot.get();
     while (true) {
         if (value == current->value) {
             // Already in the tree.
@@ -97,20 +93,20 @@ Tree<T>::add(const T& value)
 
         if (value < current->value) {
             if (!current->left) {
-                current->left = new Node(value);
+                current->left.reset(new Node(value));
                 current->left->parent = current;
                 mSize++;
                 return true;
             }
-            current = current->left;
+            current = current->left.get();
         } else {
             if (!current->right) {
-                current->right = new Node(value);
+                current->right.reset(new Node(value));
                 current->right->parent = current;
                 mSize++;
                 return true;
             }
-            current = current->right;
+            current = current->right.get();
         }
     }
     return false;
