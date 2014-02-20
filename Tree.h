@@ -6,6 +6,8 @@
 template <class T>
 class Tree
 {
+
+// Inner classes
 private:
     struct Node
     {
@@ -22,6 +24,24 @@ private:
     };
 
 public:
+    class iterator : public boost::iterator_facade<
+         iterator, T, boost::forward_traversal_tag>
+    {
+    public:
+        iterator() : iterator(NULL) {}
+        explicit iterator(Node* n) : mNode(n) {}
+
+    private:
+        friend class boost::iterator_core_access;
+
+        void increment();
+        bool equal(iterator const& other) const;
+        T& dereference() const;
+
+        Node* mNode;
+    };
+
+public:
     Tree();
     ~Tree();
 
@@ -34,33 +54,20 @@ public:
 
     size_t size() const { return mSize; }
 
+    iterator begin() const;
+    iterator end() const;
+
     // TODO: remove
     void print() const
     {
         if (mRoot) print(mRoot.get());
     }
 
-    // Iterator
-    class iterator : public boost::iterator_facade<
-         iterator, T, boost::forward_traversal_tag>
-    {
-    public:
-        iterator() : iterator(NULL) {}
-        iterator(Node* n) : mNode(n) {}
-
-    private:
-        friend class boost::iterator_core_access;
-
-        void increment();
-        bool equal(iterator const& other) const;
-        T& dereference() const;
-
-        Node* mNode;
-    };
-
 private:
     Tree(const Tree& t) = default;
     Tree& operator=(const Tree& t) = default;
+
+    Node* leftMostChild(Node* node) const;
 
     std::unique_ptr<Node> mRoot;
     size_t mSize;
@@ -132,6 +139,34 @@ Tree<T>::add(const T& value)
     return false;
 }
 
+template <class T>
+typename Tree<T>::Node*
+Tree<T>::leftMostChild(Node* node) const
+{
+    if (!node) return NULL;
+
+    Node* current = node;
+    while (current->left) {
+        current = current->left.get();
+    }
+    return current;
+}
+
+template <class T>
+typename Tree<T>::iterator
+Tree<T>::begin() const
+{
+    Node* n = leftMostChild(mRoot.get());
+    return iterator(n);
+}
+
+template <class T>
+typename Tree<T>::iterator
+Tree<T>::end() const
+{
+    return iterator();
+}
+
 
 // --------------------------------------------------------------------------
 // Iterator implementation
@@ -153,10 +188,10 @@ template <class T>
 bool
 Tree<T>::iterator::equal(iterator const& other) const
 {
-    if (!mNode || !other.mNode) {
-        return false;
+    if (mNode && other.mNode) {
+        return mNode->value == other.mNode->value;
     }
-    return mNode->value == other.mNode->value;
+    return mNode == other.mNode;
 }
 
 template <class T>
