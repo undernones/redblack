@@ -14,8 +14,6 @@ int main(int argc, char* argv[])
         int value = std::rand() % 100;
         t.add(value);
     }
-    std::cout << std::endl;
-    t.print();
     std::cout << "size: " << t.size() << std::endl;
 
     Tree<double> s;
@@ -27,6 +25,7 @@ int main(int argc, char* argv[])
     std::cout << "size: " << s.size() << std::endl;
 
     Tree<std::string> u;
+    u.add("zipper");
     u.add("hello");
     u.add("hi");
     u.add("hello");
@@ -36,10 +35,9 @@ int main(int argc, char* argv[])
     u.print();
     std::cout << "size: " << u.size() << std::endl;
 
-    Tree<std::string>::iterator it = u.begin();
-    std::cout << *it << std::endl;
-    it++;
-    std::cout << *it << std::endl;
+    for (const auto& x : t) {
+        std::cout << x << std::endl;
+    }
 
     return 0;
 }

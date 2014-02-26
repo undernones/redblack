@@ -17,6 +17,27 @@ private:
         ~Node()
         { }
 
+        // Returns the left-most node of the tree rooted at this node.
+        Node* leftMostNode()
+        {
+            Node* current = this;
+            while (current->left) {
+                current = current->left.get();
+            }
+            return current;
+        }
+
+        // Returns the left-most ancestor of this node. It is possible that this
+        // node is its own left-most ancestor.
+        Node* leftMostAncestor()
+        {
+            Node* current = this;
+            while (current->parent && current->parent->right.get() == current) {
+                current = current->parent;
+            }
+            return current;
+        }
+
         Node* parent;
         std::unique_ptr<Node> left;
         std::unique_ptr<Node> right;
@@ -28,7 +49,7 @@ public:
          iterator, T, boost::forward_traversal_tag>
     {
     public:
-        iterator() : iterator(NULL) {}
+        iterator() : iterator(nullptr) {}
         explicit iterator(Node* n) : mNode(n) {}
 
     private:
@@ -66,8 +87,6 @@ public:
 private:
     Tree(const Tree& t) = default;
     Tree& operator=(const Tree& t) = default;
-
-    Node* leftMostChild(Node* node) const;
 
     std::unique_ptr<Node> mRoot;
     size_t mSize;
@@ -140,23 +159,10 @@ Tree<T>::add(const T& value)
 }
 
 template <class T>
-typename Tree<T>::Node*
-Tree<T>::leftMostChild(Node* node) const
-{
-    if (!node) return NULL;
-
-    Node* current = node;
-    while (current->left) {
-        current = current->left.get();
-    }
-    return current;
-}
-
-template <class T>
 typename Tree<T>::iterator
 Tree<T>::begin() const
 {
-    Node* n = leftMostChild(mRoot.get());
+    Node* n = mRoot ? mRoot->leftMostNode() : nullptr;
     return iterator(n);
 }
 
@@ -180,8 +186,17 @@ Tree<T>::iterator::increment()
     }
 
     if (mNode->right) {
-        mNode = mNode->right.get();
+        mNode = mNode->right->leftMostNode();
+        return;
     }
+
+    if (mNode->parent && mNode->parent->left.get() == mNode) {
+        // The current node is the left child of its parent.
+        mNode = mNode->parent;
+        return;
+    }
+
+    mNode = mNode->leftMostAncestor()->parent;
 }
 
 template <class T>
