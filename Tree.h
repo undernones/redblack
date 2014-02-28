@@ -7,44 +7,12 @@ template <class T>
 class Tree
 {
 
-// Inner classes
 private:
-    struct Node
-    {
-        Node(const T& v) : value(v)
-        { }
-
-        ~Node()
-        { }
-
-        // Returns the left-most node of the tree rooted at this node.
-        Node* leftMostNode()
-        {
-            Node* current = this;
-            while (current->left) {
-                current = current->left.get();
-            }
-            return current;
-        }
-
-        // Returns the left-most ancestor of this node. It is possible that this
-        // node is its own left-most ancestor.
-        Node* leftMostAncestor()
-        {
-            Node* current = this;
-            while (current->parent && current->parent->right.get() == current) {
-                current = current->parent;
-            }
-            return current;
-        }
-
-        Node* parent;
-        std::unique_ptr<Node> left;
-        std::unique_ptr<Node> right;
-        T value;
-    };
+    struct Node;
 
 public:
+    // Refer to:
+    // http://www.boost.org/doc/libs/1_55_0/libs/iterator/doc/iterator_facade.html
     class iterator : public boost::iterator_facade<
          iterator, T, boost::forward_traversal_tag>
     {
@@ -78,30 +46,30 @@ public:
     iterator begin() const;
     iterator end() const;
 
-    // TODO: remove
-    void print() const
-    {
-        if (mRoot) print(mRoot.get());
-    }
-
 private:
     Tree(const Tree& t) = default;
     Tree& operator=(const Tree& t) = default;
 
+    struct Node
+    {
+        Node(const T& v);
+        ~Node();
+
+        // Returns the left-most node of the tree rooted at this node.
+        Node* leftMostNode();
+
+        // Returns the left-most ancestor of this node. It is possible that this
+        // node is its own left-most ancestor.
+        Node* leftMostAncestor();
+
+        Node* parent;
+        std::unique_ptr<Node> left;
+        std::unique_ptr<Node> right;
+        T value;
+    };
+
     std::unique_ptr<Node> mRoot;
     size_t mSize;
-
-    // TODO: remove
-    void print(const Node* node) const
-    {
-        if (node->left) {
-            print(node->left.get());
-        }
-        std::cout << node->value << std::endl;
-        if (node->right) {
-            print(node->right.get());
-        }
-    }
 };
 
 
@@ -173,6 +141,42 @@ Tree<T>::end() const
     return iterator();
 }
 
+
+// --------------------------------------------------------------------------
+// Node implementation
+// --------------------------------------------------------------------------
+template <class T>
+Tree<T>::Node::Node(const T& v)
+    : value(v)
+{
+}
+
+template <class T>
+Tree<T>::Node::~Node()
+{
+}
+
+template <class T>
+typename Tree<T>::Node*
+Tree<T>::Node::leftMostNode()
+{
+    Node* current = this;
+    while (current->left) {
+        current = current->left.get();
+    }
+    return current;
+}
+
+template <class T>
+typename Tree<T>::Node*
+Tree<T>::Node::leftMostAncestor()
+{
+    Node* current = this;
+    while (current->parent && current->parent->right.get() == current) {
+        current = current->parent;
+    }
+    return current;
+}
 
 // --------------------------------------------------------------------------
 // Iterator implementation

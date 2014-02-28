@@ -21,7 +21,6 @@ int main(int argc, char* argv[])
     s.add(90.0);
     s.add(6.1);
     s.add(-55);
-    s.print();
     std::cout << "size: " << s.size() << std::endl;
 
     Tree<std::string> u;
@@ -32,7 +31,6 @@ int main(int argc, char* argv[])
     u.add("hell");
     u.add("wither");
     u.add("bumbo");
-    u.print();
     std::cout << "size: " << u.size() << std::endl;
 
     for (const auto& x : t) {
