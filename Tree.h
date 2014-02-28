@@ -35,7 +35,7 @@ public:
     ~Tree();
 
     void clear();
-    bool isEmpty() const;
+    bool isEmpty() const { return mSize == 0; }
 
     bool add(const T& value);
     bool remove(const T& value);
@@ -89,6 +89,14 @@ Tree<T>::~Tree()
 }
 
 template <class T>
+void
+Tree<T>::clear()
+{
+    mRoot.reset();
+    mSize = 0;
+}
+
+template <class T>
 bool
 Tree<T>::add(const T& value)
 {
@@ -120,6 +128,33 @@ Tree<T>::add(const T& value)
                 mSize++;
                 return true;
             }
+            current = current->right.get();
+        }
+    }
+    return false;
+}
+
+template <class T>
+bool
+Tree<T>::remove(const T& value)
+{
+    // TODO: implement this!
+    return false;
+}
+
+template <class T>
+bool
+Tree<T>::contains(const T& value) const
+{
+    Node* current = mRoot.get();
+    while (current) {
+        if (value == current->value) {
+            return true;
+        }
+
+        if (value < current->value) {
+            current = current->left.get();
+        } else {
             current = current->right.get();
         }
     }

@@ -33,9 +33,15 @@ int main(int argc, char* argv[])
     u.add("bumbo");
     std::cout << "size: " << u.size() << std::endl;
 
-    for (const auto& x : t) {
+    for (const auto& x : u) {
         std::cout << x << std::endl;
     }
+
+    std::string value("wither");
+    std::cout << "contains " << value << "? " << u.contains(value) << std::endl;
+    u.clear();
+    std::cout << "contains " << value << "? " << u.contains(value) << std::endl;
+    std::cout << "empty? " << u.isEmpty() << std::endl;
 
     return 0;
 }
