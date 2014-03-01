@@ -11,6 +11,18 @@ private:
     struct Node;
 
 public:
+    Tree();
+    ~Tree();
+
+    void clear();
+    bool isEmpty() const { return mSize == 0; }
+
+    bool add(const T& value);
+    bool remove(const T& value);
+    bool contains(const T& value) const;
+
+    size_t size() const { return mSize; }
+
     // Refer to:
     // http://www.boost.org/doc/libs/1_55_0/libs/iterator/doc/iterator_facade.html
     class iterator : public boost::iterator_facade<
@@ -29,19 +41,6 @@ public:
 
         Node* mNode;
     };
-
-public:
-    Tree();
-    ~Tree();
-
-    void clear();
-    bool isEmpty() const { return mSize == 0; }
-
-    bool add(const T& value);
-    bool remove(const T& value);
-    bool contains(const T& value) const;
-
-    size_t size() const { return mSize; }
 
     iterator begin() const;
     iterator end() const;
