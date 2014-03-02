@@ -142,10 +142,27 @@ Tree<T>::remove(const T& value)
         if (value == current->value) {
             // Found it! Proceed to remove.
             if (!current->left && !current->right) {
-                if (current == current->parent->left.get()) {
+                // No sub-tree. Set parent's left or right child to null.
+
+                if (!current->parent) {
+                    // This is the root.
+                    mRoot.reset();
+                } else if (current == current->parent->left.get()) {
+                    // This is the left child.
                     current->parent->left.reset();
-                } //else 
+                } else {
+                    // This is the right child.
+                    current->parent->right.reset();
+                }
+            } else if (!current->left && current->right) {
+                // Only right sub-tree present.
+            } else if (current->left && !current->right) {
+                // Only left sub-tree present.
+            } else {
+                // Both sub-trees present.
             }
+
+            mSize--;
             return true;
         }
     }
