@@ -156,8 +156,18 @@ Tree<T>::remove(const T& value)
                 }
             } else if (!current->left && current->right) {
                 // Only right sub-tree present.
+                if (!current->parent) {
+                    mRoot = mRoot->right;
+                } else {
+                    current->parent->right = current->right;
+                }
             } else if (current->left && !current->right) {
                 // Only left sub-tree present.
+                if (!current->parent) {
+                    mRoot = mRoot->left;
+                } else {
+                    current->parent->left = current->left;
+                }
             } else {
                 // Both sub-trees present.
             }
