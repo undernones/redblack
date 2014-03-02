@@ -4,7 +4,8 @@
 
 #include "Tree.h"
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     std::srand(std::time(0));
 

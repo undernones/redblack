@@ -62,12 +62,12 @@ private:
         Node* leftMostAncestor();
 
         Node* parent;
-        std::unique_ptr<Node> left;
-        std::unique_ptr<Node> right;
+        std::shared_ptr<Node> left;
+        std::shared_ptr<Node> right;
         T value;
     };
 
-    std::unique_ptr<Node> mRoot;
+    std::shared_ptr<Node> mRoot;
     size_t mSize;
 };
 
