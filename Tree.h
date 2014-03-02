@@ -137,7 +137,18 @@ template <class T>
 bool
 Tree<T>::remove(const T& value)
 {
-    // TODO: implement this!
+    Node* current = mRoot.get();
+    while (current) {
+        if (value == current->value) {
+            // Found it! Proceed to remove.
+            if (!current->left && !current->right) {
+                if (current == current->parent->left.get()) {
+                    current->parent->left.reset();
+                } //else 
+            }
+            return true;
+        }
+    }
     return false;
 }
 
