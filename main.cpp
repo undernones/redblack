@@ -34,10 +34,16 @@ main(int argc, char* argv[])
     u.add("bumbo");
     std::cout << "size: " << u.size() << std::endl;
 
+    std::vector<std::string> strings;
+    strings.reserve(u.size());
     for (const auto& x : u) {
         std::cout << x << std::endl;
+        strings.push_back(x);
     }
 
+    for (const auto& x : strings) {
+        u.remove(x);
+    }
     std::string value("wither");
     std::cout << "contains " << value << "? " << u.contains(value) << std::endl;
     u.clear();
