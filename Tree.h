@@ -104,6 +104,7 @@ Tree<T>::add(const T& value)
 {
     if (!mRoot.left) {
         mRoot.left.reset(new Node(value));
+        mRoot.left->parent = &mRoot;
         mSize++;
         return true;
     }
@@ -179,6 +180,12 @@ Tree<T>::remove(const T& value)
 
             mSize--;
             return true;
+        }
+
+        if (value < current->value) {
+            current = current->left.get();
+        } else {
+            current = current->right.get();
         }
     }
     return false;
