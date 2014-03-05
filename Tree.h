@@ -169,7 +169,12 @@ Tree<T>::remove(const T& value)
                     current->parent->right = current->left;
                 }
             } else {
-                // Both sub-trees present.
+                // Both sub-trees present. Replace the current node's value with
+                // the smallest value in the right sub-tree, then delete that
+                // node containing the smallest value.
+                Node* smallest = current->right->leftMostNode();
+                current->value = smallest->value();
+                smallest->parent->left = smallest->right;
             }
 
             mSize--;
