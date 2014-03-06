@@ -157,6 +157,7 @@ Tree<T>::remove(const T& value)
                 }
             } else if (!current->left && current->right) {
                 // Only right sub-tree present.
+                current->right->parent = current->parent;
                 if (current == current->parent->left.get()) {
                     current->parent->left = current->right;
                 } else {
@@ -164,6 +165,7 @@ Tree<T>::remove(const T& value)
                 }
             } else if (current->left && !current->right) {
                 // Only left sub-tree present.
+                current->left->parent = current->parent;
                 if (current == current->parent->left.get()) {
                     current->parent->left = current->left;
                 } else {
