@@ -177,6 +177,7 @@ Tree<T>::remove(const T& value)
                 // node containing the smallest value.
                 Node* smallest = current->right->leftMostNode();
                 current->value = smallest->value;
+                smallest->right->parent = smallest->parent;
                 smallest->parent->left = smallest->right;
             }
 
