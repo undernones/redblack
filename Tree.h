@@ -51,8 +51,11 @@ private:
 
     struct Node
     {
+        // New nodes will default to red.
         Node(const T& v);
         ~Node();
+
+        enum class Color { RED, BLACK };
 
         // Returns the left-most node of the tree rooted at this node.
         Node* leftMostNode();
@@ -65,6 +68,8 @@ private:
         std::shared_ptr<Node> left;
         std::shared_ptr<Node> right;
         T value;
+
+        Color color;
     };
 
     // This is a fake root node that is always present, the value of which is
@@ -102,39 +107,43 @@ template <class T>
 bool
 Tree<T>::add(const T& value)
 {
+    Node* current;
+    bool isModified = false;
+
     if (!mRoot.left) {
         mRoot.left.reset(new Node(value));
         mRoot.left->parent = &mRoot;
+        current = mRoot.left.get();
+        isModified = true;
+    } else {
+        Node* current = mRoot.left.get();
+        bool done = false;
+        while (!done) {
+            if (value == current->value) {
+                // Already in the tree.
+                done = true;
+            } else if (value < current->value) {
+                if (!current->left) {
+                    current->left.reset(new Node(value));
+                    current->left->parent = current;
+                    isModified = done = true;
+                }
+                current = current->left.get();
+            } else {
+                if (!current->right) {
+                    current->right.reset(new Node(value));
+                    current->right->parent = current;
+                    isModified = done = true;
+                }
+                current = current->right.get();
+            }
+        }
+    }
+
+    if (isModified) {
         mSize++;
-        return true;
     }
-
-    Node* current = mRoot.left.get();
-    while (true) {
-        if (value == current->value) {
-            // Already in the tree.
-            return false;
-        }
-
-        if (value < current->value) {
-            if (!current->left) {
-                current->left.reset(new Node(value));
-                current->left->parent = current;
-                mSize++;
-                return true;
-            }
-            current = current->left.get();
-        } else {
-            if (!current->right) {
-                current->right.reset(new Node(value));
-                current->right->parent = current;
-                mSize++;
-                return true;
-            }
-            current = current->right.get();
-        }
-    }
-    return false;
+    return isModified;
 }
 
 template <class T>
@@ -235,6 +244,7 @@ Tree<T>::end()
 template <class T>
 Tree<T>::Node::Node(const T& v)
     : value(v)
+    , color(Color::RED)
 {
 }
 
