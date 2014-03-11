@@ -1,5 +1,6 @@
-#include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
 #include <vector>
 
 #include "Tree.h"
@@ -7,48 +8,34 @@
 int
 main(int argc, char* argv[])
 {
-    std::srand(std::time(0));
-
-    Tree<int> t;
-
-    for (int i = 0; i < 50; ++i) {
-        int value = std::rand() % 100;
-        t.add(value);
-    }
-    std::cout << "size: " << t.size() << std::endl;
-
-    Tree<double> s;
-    s.add(5.5);
-    s.add(90.0);
-    s.add(6.1);
-    s.add(-55);
-    std::cout << "size: " << s.size() << std::endl;
+    std::vector<std::string> values = {
+        "zipper",
+        "hello",
+        "hi",
+        "hello",
+        "hell",
+        "wither",
+        "bumbo",
+    };
 
     Tree<std::string> u;
-    u.add("zipper");
-    u.add("hello");
-    u.add("hi");
-    u.add("hello");
-    u.add("hell");
-    u.add("wither");
-    u.add("bumbo");
-    std::cout << "size: " << u.size() << std::endl;
-
-    std::vector<std::string> strings;
-    strings.reserve(u.size());
-    for (const auto& x : u) {
-        strings.push_back(x);
+    for (auto& x : values) {
+        u.add(x);
     }
+    std::cout << "size: " << u.size() << std::endl;
+    std::ofstream origFile("/tmp/orig.dot", std::ios::out);
+    if (!origFile.is_open()) {
+        std::cerr << "Could not open /tmp/orig.dot" << std::endl;
+        return 1;
+    }
+    u.dumpToDot(origFile);
+    origFile.close();
 
-    for (const auto& x : strings) {
-        std::cout << x << std::endl;
+    for (size_t i = 0; i < values.size(); ++i) {
+        auto& x = values[i];
         u.remove(x);
     }
-    std::string value("wither");
-    std::cout << "contains " << value << "? " << u.contains(value) << std::endl;
-    u.clear();
-    std::cout << "contains " << value << "? " << u.contains(value) << std::endl;
-    std::cout << "empty? " << u.isEmpty() << std::endl;
+    std::cout << "size: " << u.size() << std::endl;
 
     return 0;
 }

@@ -2,6 +2,7 @@
 #define TREE_H
 
 #include <boost/iterator/iterator_facade.hpp>
+#include <ostream>
 
 template <class T>
 class Tree
@@ -22,6 +23,8 @@ public:
     bool contains(const T& value) const;
 
     size_t size() const { return mSize; }
+
+    void dumpToDot(std::ostream& out) const;
 
     // Refer to:
     // http://www.boost.org/doc/libs/1_55_0/libs/iterator/doc/iterator_facade.html
@@ -63,6 +66,8 @@ private:
         // Returns the left-most ancestor of this node. It is possible that this
         // node is its own left-most ancestor.
         Node* leftMostAncestor();
+
+        void dumpToDot(std::ostream& out) const;
 
         Node* parent;
         std::shared_ptr<Node> left;
@@ -223,6 +228,18 @@ Tree<T>::contains(const T& value) const
 }
 
 template <class T>
+void
+Tree<T>::dumpToDot(std::ostream& out) const
+{
+    out << "digraph BST {\n"
+        << "  graph [ordering=\"out\"];\n";
+    if (mRoot.left) {
+        mRoot.left->dumpToDot(out);
+    }
+    out << "}" << std::endl;
+}
+
+template <class T>
 typename Tree<T>::iterator
 Tree<T>::begin()
 {
@@ -273,6 +290,27 @@ Tree<T>::Node::leftMostAncestor()
         current = current->parent;
     }
     return current;
+}
+
+template <class T>
+void
+Tree<T>::Node::dumpToDot(std::ostream& out) const
+{
+    if (left) {
+        out << value << "--" << left->value << ";\n";
+    }
+
+    if (right) {
+        out << value << "--" << right->value << ";\n";
+    }
+
+    if (left) {
+        left->dumpToDot(out);
+    }
+
+    if (right) {
+        right->dumpToDot(out);
+    }
 }
 
 // --------------------------------------------------------------------------

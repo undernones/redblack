@@ -7,6 +7,8 @@ else()
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the build type. Options are: Debug, Release")
 endif()
 
+enable_testing()
+
 include_directories(
     .
     lib
@@ -28,6 +30,11 @@ endif()
 
 set(SRC )
 add_executable(headless main.cpp ${SRC})
+
+# http://www.cmake.org/pipermail/cmake/2007-March/013380.html
+add_executable(tests test/TestRunner.cpp)
+target_link_libraries(tests cppunit dl)
+add_test(UnitTests tests)
 
 message(STATUS)
 message(STATUS "--------------------------------------------------------------------------------")

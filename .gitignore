@@ -2,7 +2,11 @@
 build/CMakeCache.txt
 build/CMakeFiles
 build/Makefile
+build/Testing
 build/cmake_install.cmake
 build/headless
+build/tests
 
 tags
+
+build/CTestTestfile.cmake
