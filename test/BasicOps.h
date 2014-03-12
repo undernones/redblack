@@ -29,9 +29,9 @@ void
 BasicOpsTest::setUp()
 {
     mValues.push_back("zipper");
-    mValues.push_back("hello");
+    mValues.push_back("hawked");
     mValues.push_back("hi");
-    mValues.push_back("hell");
+    mValues.push_back("hawk");
     mValues.push_back("wither");
     mValues.push_back("bumbo");
 
@@ -78,11 +78,8 @@ BasicOpsTest::testRemove()
         CPPUNIT_ASSERT(mTree.remove(x));
         CPPUNIT_ASSERT(mTree.size() == count - 1);
         CPPUNIT_ASSERT(!mTree.contains(x));
-
-        std::cout << "value: " << x << std::endl;
         CPPUNIT_ASSERT(!mTree.remove(x));
         CPPUNIT_ASSERT(mTree.size() == count - 1);
-        CPPUNIT_ASSERT(!mTree.contains(x));
     }
     CPPUNIT_ASSERT(mTree.isEmpty());
 }

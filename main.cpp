@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include "Tree.h"
@@ -10,10 +11,10 @@ main(int argc, char* argv[])
 {
     std::vector<std::string> values = {
         "zipper",
-        "hello",
+        "hawked",
         "hi",
-        "hello",
-        "hell",
+        "hawked",
+        "hawk",
         "wither",
         "bumbo",
     };
@@ -34,6 +35,22 @@ main(int argc, char* argv[])
     for (size_t i = 0; i < values.size(); ++i) {
         auto& x = values[i];
         u.remove(x);
+        std::stringstream filename;
+        filename << "/tmp/bst." << i << ".dot";
+        std::ofstream file(filename.str().c_str());
+        if (!file.is_open()) {
+            std::cerr << "Could not open " << filename.str() << std::endl;
+            return 1;
+        }
+        u.dumpToDot(file);
+        file.flush();
+        file.close();
+        std::cout << "removed: " << x << std::endl;
+
+        for (auto& v : u) {
+            std::cout << "value (" << i << "): " << v << std::endl;
+        }
+        std::cout << std::endl;
     }
     std::cout << "size: " << u.size() << std::endl;
 

@@ -3,6 +3,7 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <ostream>
+#include <stdexcept>
 
 template <class T>
 class Tree
@@ -32,8 +33,8 @@ public:
          iterator, T, boost::forward_traversal_tag>
     {
     public:
-        iterator() : iterator(nullptr) {}
-        explicit iterator(Node* n) : mNode(n) {}
+        iterator() : iterator(nullptr, nullptr) {}
+        explicit iterator(Node* n, const Tree* tree);
 
     private:
         friend class boost::iterator_core_access;
@@ -43,6 +44,7 @@ public:
         T& dereference() const;
 
         Node* mNode;
+        const Tree* mTree;
     };
 
     iterator begin();
@@ -191,8 +193,10 @@ Tree<T>::remove(const T& value)
                 // node containing the smallest value.
                 Node* smallest = current->right->leftMostNode();
                 current->value = smallest->value;
-                smallest->right->parent = smallest->parent;
-                smallest->parent->left = smallest->right;
+                if (smallest->right) {
+                    smallest->right->parent = smallest->parent;
+                }
+                smallest->parent->right = smallest->right;
             }
 
             mSize--;
@@ -244,7 +248,11 @@ typename Tree<T>::iterator
 Tree<T>::begin()
 {
     Node* n = mRoot.leftMostNode();
-    return iterator(n);
+    if (n == &mRoot) {
+        return end();
+    } else {
+        return iterator(n, this);
+    }
 }
 
 template <class T>
@@ -296,12 +304,17 @@ template <class T>
 void
 Tree<T>::Node::dumpToDot(std::ostream& out) const
 {
+    if (!left && !right) {
+        out << "  " << value << ";\n";
+        return;
+    }
+
     if (left) {
-        out << value << "--" << left->value << ";\n";
+        out << "  " << value << "->" << left->value << ";\n";
     }
 
     if (right) {
-        out << value << "--" << right->value << ";\n";
+        out << "  " << value << "->" << right->value << ";\n";
     }
 
     if (left) {
@@ -316,26 +329,40 @@ Tree<T>::Node::dumpToDot(std::ostream& out) const
 // --------------------------------------------------------------------------
 // Iterator implementation
 // --------------------------------------------------------------------------
+
+template <class T>
+Tree<T>::iterator::iterator(Tree<T>::Node* n, const Tree<T>* tree)
+    : mNode(n)
+    , mTree(tree)
+{
+}
+
 template <class T>
 void
 Tree<T>::iterator::increment()
 {
     if (!mNode) {
-        // TODO: throw an exception
+        throw std::logic_error("Bad iterator.");
     }
 
     if (mNode->right) {
+        // If there is a right subtree, go to the lowest value of that subtree.
         mNode = mNode->right->leftMostNode();
-        return;
-    }
-
-    if (mNode->parent && mNode->parent->left.get() == mNode) {
-        // The current node is the left child of its parent.
+    } else if (mNode->parent && mNode->parent->left.get() == mNode) {
+        // The current node is the left child of its parent, so the next node is
+        // just the parent.
         mNode = mNode->parent;
-        return;
+    } else {
+        // Pop back up to the top of this subtree, then scoot over to the
+        // parent.
+        mNode = mNode->leftMostAncestor()->parent;
     }
 
-    mNode = mNode->leftMostAncestor()->parent;
+    if (mNode == &mTree->mRoot) {
+        // Special case for the fake root. If we have reached it, the iterator
+        // node should be null.
+        mNode = nullptr;
+    }
 }
 
 template <class T>
