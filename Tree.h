@@ -78,10 +78,7 @@ private:
         Color color;
     };
 
-    // This is a fake root node that is always present, the value of which is
-    // not considered to be in the set. All values in the set are contained
-    // within the fake root's left sub-tree.
-    Node mRoot;
+    std::shared_ptr<Node> mRoot;
     size_t mSize;
 };
 
@@ -91,7 +88,7 @@ private:
 // --------------------------------------------------------------------------
 template <class T>
 Tree<T>::Tree()
-    : mRoot(T())
+    : mRoot()
     , mSize(0)
 {
 }
@@ -105,7 +102,7 @@ template <class T>
 void
 Tree<T>::clear()
 {
-    mRoot.left.reset();
+    mRoot.reset();
     mSize = 0;
 }
 
@@ -116,14 +113,14 @@ Tree<T>::add(const T& value)
     Node* current;
     bool isModified = false;
 
-    if (!mRoot.left) {
-        // The real root is black.
-        mRoot.left.reset(new Node(value, Node::Color::BLACK));
-        mRoot.left->parent = &mRoot;
-        current = mRoot.left.get();
+    if (!mRoot) {
+        // The root is black.
+        mRoot.reset(new Node(value, Node::Color::BLACK));
+        mRoot->parent = nullptr;
+        current = mRoot.get();
         isModified = true;
     } else {
-        Node* current = mRoot.left.get();
+        Node* current = mRoot.get();
         bool done = false;
         while (!done) {
             if (value == current->value) {
@@ -160,32 +157,44 @@ Tree<T>::remove(const T& value)
     // Refer to:
     // http://webdocs.cs.ualberta.ca/~holte/T26/del-from-bst.html
 
-    Node* current = mRoot.left.get();
+    std::shared_ptr<Node> current = mRoot;
     while (current) {
         if (value == current->value) {
             // Found it! Proceed to remove.
             if (!current->left && !current->right) {
                 // No sub-tree. Set parent's left or right child to null.
-                if (current == current->parent->left.get()) {
-                    current->parent->left.reset();
+                if (current->parent) {
+                    if (current == current->parent->left) {
+                        current->parent->left.reset();
+                    } else {
+                        current->parent->right.reset();
+                    }
                 } else {
-                    current->parent->right.reset();
+                    mRoot.reset();
                 }
             } else if (!current->left && current->right) {
                 // Only right sub-tree present.
                 current->right->parent = current->parent;
-                if (current == current->parent->left.get()) {
-                    current->parent->left = current->right;
+                if (current->parent) {
+                    if (current == current->parent->left) {
+                        current->parent->left = current->right;
+                    } else {
+                        current->parent->right = current->right;
+                    }
                 } else {
-                    current->parent->right = current->right;
+                    mRoot = current->right;
                 }
             } else if (current->left && !current->right) {
                 // Only left sub-tree present.
                 current->left->parent = current->parent;
-                if (current == current->parent->left.get()) {
-                    current->parent->left = current->left;
+                if (current->parent) {
+                    if (current == current->parent->left) {
+                        current->parent->left = current->left;
+                    } else {
+                        current->parent->right = current->left;
+                    }
                 } else {
-                    current->parent->right = current->left;
+                    mRoot = current->left;
                 }
             } else {
                 // Both sub-trees present. Replace the current node's value with
@@ -204,9 +213,9 @@ Tree<T>::remove(const T& value)
         }
 
         if (value < current->value) {
-            current = current->left.get();
+            current = current->left;
         } else {
-            current = current->right.get();
+            current = current->right;
         }
     }
     return false;
@@ -216,7 +225,7 @@ template <class T>
 bool
 Tree<T>::contains(const T& value) const
 {
-    Node* current = mRoot.left.get();
+    Node* current = mRoot.get();
     while (current) {
         if (value == current->value) {
             return true;
@@ -237,8 +246,8 @@ Tree<T>::dumpToDot(std::ostream& out) const
 {
     out << "digraph BST {\n"
         << "  graph [ordering=\"out\"];\n";
-    if (mRoot.left) {
-        mRoot.left->dumpToDot(out);
+    if (mRoot) {
+        mRoot->dumpToDot(out);
     }
     out << "}" << std::endl;
 }
@@ -247,12 +256,8 @@ template <class T>
 typename Tree<T>::iterator
 Tree<T>::begin()
 {
-    Node* n = mRoot.leftMostNode();
-    if (n == &mRoot) {
-        return end();
-    } else {
-        return iterator(n, this);
-    }
+    Node* n = mRoot ? mRoot->leftMostNode() : nullptr;
+    return iterator(n, this);
 }
 
 template <class T>
@@ -356,12 +361,6 @@ Tree<T>::iterator::increment()
         // Pop back up to the top of this subtree, then scoot over to the
         // parent.
         mNode = mNode->leftMostAncestor()->parent;
-    }
-
-    if (mNode == &mTree->mRoot) {
-        // Special case for the fake root. If we have reached it, the iterator
-        // node should be null.
-        mNode = nullptr;
     }
 }
 
