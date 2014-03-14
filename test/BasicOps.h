@@ -17,6 +17,7 @@ class BasicOpsTest : public CppUnit::TestFixture
     CPPUNIT_TEST(testClear);
     CPPUNIT_TEST(testIsEmpty);
     CPPUNIT_TEST(testDumpToDot);
+    CPPUNIT_TEST(testIterator);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -29,6 +30,7 @@ public:
     void testClear();
     void testIsEmpty();
     void testDumpToDot();
+    void testIterator();
 
 private:
     Tree<std::string> mTree;
@@ -138,6 +140,27 @@ BasicOpsTest::testDumpToDot()
 "  wither;\n"
 "}\n";
     CPPUNIT_ASSERT(stream.str() == expected);
+}
+
+void
+BasicOpsTest::testIterator()
+{
+    std::vector<std::string> values;
+    values.reserve(mTree.size());
+
+    for (auto& x : mTree) {
+        values.push_back(x);
+    }
+
+    std::vector<std::string> expected = {
+        "bumbo",
+        "hawk",
+        "hawked",
+        "hi",
+        "wither",
+        "zipper",
+    };
+    CPPUNIT_ASSERT(values == expected);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(BasicOpsTest);
