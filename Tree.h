@@ -56,11 +56,10 @@ private:
 
     struct Node
     {
-        // New nodes will default to red.
-        Node(const T& v);
-        ~Node();
-
         enum class Color { RED, BLACK };
+
+        Node(const T& v, Color c = Color::RED);
+        ~Node();
 
         // Returns the left-most node of the tree rooted at this node.
         Node* leftMostNode();
@@ -118,7 +117,8 @@ Tree<T>::add(const T& value)
     bool isModified = false;
 
     if (!mRoot.left) {
-        mRoot.left.reset(new Node(value));
+        // The real root is black.
+        mRoot.left.reset(new Node(value, Node::Color::BLACK));
         mRoot.left->parent = &mRoot;
         current = mRoot.left.get();
         isModified = true;
@@ -267,9 +267,9 @@ Tree<T>::end()
 // Node implementation
 // --------------------------------------------------------------------------
 template <class T>
-Tree<T>::Node::Node(const T& v)
+Tree<T>::Node::Node(const T& v, Color c)
     : value(v)
-    , color(Color::RED)
+    , color(c)
 {
 }
 
