@@ -310,11 +310,11 @@ Tree<T>::Node::dumpToDot(std::ostream& out) const
     }
 
     if (left) {
-        out << "  " << value << "->" << left->value << ";\n";
+        out << "  " << value << " -> " << left->value << ";\n";
     }
 
     if (right) {
-        out << "  " << value << "->" << right->value << ";\n";
+        out << "  " << value << " -> " << right->value << ";\n";
     }
 
     if (left) {

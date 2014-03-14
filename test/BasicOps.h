@@ -1,3 +1,8 @@
+#ifndef BASIC_OPS_H
+#define BASIC_OPS_H
+
+#include <sstream>
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -9,6 +14,9 @@ class BasicOpsTest : public CppUnit::TestFixture
     CPPUNIT_TEST(testAdd);
     CPPUNIT_TEST(testContains);
     CPPUNIT_TEST(testRemove);
+    CPPUNIT_TEST(testClear);
+    CPPUNIT_TEST(testIsEmpty);
+    CPPUNIT_TEST(testDumpToDot);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -18,6 +26,9 @@ public:
     void testAdd();
     void testContains();
     void testRemove();
+    void testClear();
+    void testIsEmpty();
+    void testDumpToDot();
 
 private:
     Tree<std::string> mTree;
@@ -84,5 +95,52 @@ BasicOpsTest::testRemove()
     CPPUNIT_ASSERT(mTree.isEmpty());
 }
 
+void
+BasicOpsTest::testClear()
+{
+    CPPUNIT_ASSERT(mTree.size() == mValues.size());
+
+    mTree.clear();
+    CPPUNIT_ASSERT(mTree.size() == 0);
+
+    bool looped = false;
+    for (auto& x : mTree) {
+        looped = x == x;
+    }
+    CPPUNIT_ASSERT(!looped);
+}
+
+void
+BasicOpsTest::testIsEmpty()
+{
+    CPPUNIT_ASSERT(mTree.size() == mValues.size());
+
+    CPPUNIT_ASSERT(!mTree.isEmpty());
+    mTree.clear();
+    CPPUNIT_ASSERT(mTree.isEmpty());
+}
+
+void
+BasicOpsTest::testDumpToDot()
+{
+    std::stringstream stream;
+    mTree.dumpToDot(stream);
+
+    std::string expected =
+"digraph BST {\n"
+"  graph [ordering=\"out\"];\n"
+"  zipper -> hawked;\n"
+"  hawked -> hawk;\n"
+"  hawked -> hi;\n"
+"  hawk -> bumbo;\n"
+"  bumbo;\n"
+"  hi -> wither;\n"
+"  wither;\n"
+"}\n";
+    CPPUNIT_ASSERT(stream.str() == expected);
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION(BasicOpsTest);
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(BasicOpsTest, "BasicOpsTest");
+
+#endif // BASIC_OPS_H
